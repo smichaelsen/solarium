@@ -2,6 +2,7 @@
 
 namespace Solarium\Core\Client;
 
+use ApacheSolrForTypo3\Solr\SignalSender;
 use Solarium\Core\Client\Adapter\AdapterInterface;
 use Solarium\Core\Configurable;
 use Solarium\Core\Event\Events;
@@ -42,6 +43,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class Client extends Configurable implements ClientInterface
 {
+    use SignalSender;
+
     /**
      * Querytype select.
      */

@@ -2,6 +2,7 @@
 
 namespace Solarium\Core\Client\Adapter;
 
+use ApacheSolrForTypo3\Solr\SignalSender;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\RequestOptions;
 use Solarium\Core\Client\Endpoint;
@@ -15,6 +16,8 @@ use Solarium\Exception\HttpException;
  */
 class Guzzle extends Configurable implements AdapterInterface
 {
+    use SignalSender;
+
     /**
      * The Guzzle HTTP client instance.
      *
@@ -58,11 +61,13 @@ class Guzzle extends Configurable implements AdapterInterface
         try {
             $baseUri = $request->getIsServerRequest() ? $endpoint->getServerUri() : $endpoint->getCoreBaseUri();
             $uri = $baseUri.$request->getUri();
+            $this->emitLoggingSignal('beforeGuzzleClientRequest', ['uri' => $uri, 'method' => $request->getMethod(), 'options' => $requestOptions, 'defaultOptions' => $this->options,]);
             $guzzleResponse = $this->getGuzzleClient()->request(
                 $request->getMethod(),
                 $uri,
                 $requestOptions
             );
+            $this->emitLoggingSignal('afterGuzzleClientRequest');
 
             $responseHeaders = [
                 "HTTP/{$guzzleResponse->getProtocolVersion()} {$guzzleResponse->getStatusCode()} "
